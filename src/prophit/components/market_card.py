@@ -28,8 +28,9 @@ def market_card(market_id: int, question: str, status: str = "active", show_plot
         Div(
             H3("Probability Over Time"),
             Div(
-                Canvas(id=f"priceChart-{market_id}", style="max-height: 300px;"),
-                cls="chart-container"
+                Canvas(id=f"priceChart-{market_id}", style="width: 100%; height: 250px;"),
+                cls="chart-container",
+                style="height: 250px; width: 100%;"
             ),
             style="margin: 20px 0;"
         ) if show_plot else None,

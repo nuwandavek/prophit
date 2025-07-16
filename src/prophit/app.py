@@ -274,6 +274,9 @@ def create_app():
                     border-radius: 6px;
                     border: 1px solid var(--border);
                     box-shadow: var(--shadow);
+                    height: 250px;
+                    width: 100%;
+                    position: relative;
                 }
                 
                 .back-link {
