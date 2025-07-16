@@ -1,6 +1,7 @@
 from fasthtml.common import *
 from ..utils.lmsr import LMSRCalculator
 from ..constants import DEFAULT_TRADE_QUANTITY
+from ..models.database import get_db, Position
 
 
 def market_card(market_id: int, question: str, status: str = "active", show_plot: bool = False):
@@ -9,8 +10,18 @@ def market_card(market_id: int, question: str, status: str = "active", show_plot
     shares = calculator.get_current_shares(market_id)
     prices = calculator.calculate_prices(shares)
     
-    # Create the question display - link if not showing plot, plain text if showing plot
-    question_display = H3(question) if show_plot else H3(A(question, href=f"/market/{market_id}"))
+    # Calculate total trade volume and total shares
+    with get_db() as db:
+        total_volume = db.query(Position).filter(Position.market_id == market_id).count()
+        if total_volume == 0:
+            total_volume = 0
+        
+        # Calculate total shares (sum of all shares across all positions)
+        total_shares_result = db.query(Position).filter(Position.market_id == market_id).all()
+        total_shares = sum(pos.shares for pos in total_shares_result) if total_shares_result else 0
+    
+    # Create the question display - always make it a clickable link
+    question_display = H3(A(question, href=f"/market/{market_id}"))
     
     return Div(
         question_display,
@@ -20,9 +31,8 @@ def market_card(market_id: int, question: str, status: str = "active", show_plot
             cls="prices-container"
         ),
         Div(
-            Div(f"Yes Shares: {shares[1]:.1f}"),
-            Div(f"No Shares: {shares[0]:.1f}"),
-            cls="shares-info"
+            Div(f"Total Trades: {total_volume} ({total_shares:.1f} shares)"),
+            cls="volume-info"
         ),
         # Show plot if requested
         Div(
@@ -56,9 +66,10 @@ def trade_form(market_id: int):
                   placeholder="Shares", 
                   min="1", 
                   step="1", 
-                  value=str(int(DEFAULT_TRADE_QUANTITY))),
+                  value=str(int(DEFAULT_TRADE_QUANTITY)),
+                  cls="quantity-input"),
+            Button("Buy Shares", type="submit", cls="buy-btn"),
             Input(type="hidden", name="outcome", value="1"),
-            Button("Buy Shares", type="submit"),
             cls="trade-form"
         ),
         hx_post=f"/trade/{market_id}",

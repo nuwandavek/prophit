@@ -133,12 +133,13 @@ def create_app():
                     border-left: 3px solid var(--danger);
                 }
                 
-                .shares-info {
+                .volume-info {
                     display: flex;
-                    gap: 20px;
+                    justify-content: center;
                     margin-bottom: 15px;
                     font-size: 0.9rem;
                     color: var(--text-light);
+                    font-weight: 500;
                 }
                 
                 .trade-form {
@@ -149,6 +150,16 @@ def create_app():
                     margin-top: 20px;
                     padding-top: 20px;
                     border-top: 1px solid var(--border);
+                    justify-content: center;
+                }
+                
+                .quantity-input {
+                    width: 80px;
+                }
+                
+                .buy-btn {
+                    flex-shrink: 0;
+                    width: auto !important;
                 }
                 
                 .outcome-btn {
@@ -258,6 +269,25 @@ def create_app():
                     font-weight: 500;
                 }
                 
+                .markets-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                }
+                
+                .market-item {
+                    width: 100%;
+                }
+                
+                #market-search {
+                    transition: border-color 0.2s ease;
+                }
+                
+                #market-search:focus {
+                    outline: none;
+                    border-color: var(--primary);
+                }
+                
                 .empty-state {
                     text-align: center;
                     padding: 40px;
@@ -298,9 +328,8 @@ def create_app():
                         gap: 1rem;
                     }
                     
-                    .shares-info {
-                        flex-direction: column;
-                        gap: 0.5rem;
+                    .volume-info {
+                        margin-bottom: 10px;
                     }
                     
                     .trade-form {
@@ -310,6 +339,19 @@ def create_app():
                     
                     .outcome-btn {
                         justify-content: center;
+                    }
+                    
+                    .quantity-input {
+                        width: 100%;
+                    }
+                    
+                    .buy-btn {
+                        width: auto;
+                    }
+                    
+                    .markets-grid {
+                        grid-template-columns: 1fr;
+                        gap: 15px;
                     }
                 }
             """)

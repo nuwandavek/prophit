@@ -53,7 +53,7 @@ def generate_homepage_charts(markets):
             # Prepare chart data
             if history:
                 chart_data = {
-                    "labels": [h.timestamp.strftime("%m/%d %H:%M") for h in history],
+                    "labels": [h.timestamp.strftime("%m/%d") for h in history],
                     "datasets": [{
                         "label": "Yes Probability",
                         "data": [h.yes_price for h in history],
@@ -122,6 +122,7 @@ def generate_homepage_charts(markets):
                                         font: {{
                                             family: 'JetBrains Mono'
                                         }},
+                                        autoSkip: true,
                                         maxTicksLimit: 10
                                     }},
                                     grid: {{
@@ -176,8 +177,6 @@ def register_market_routes(app, rt):
                 print(f"  Market {market.id}: {market.question}")
         
         return Titled("Prophit - Prediction Markets",
-            Div(
-                # Market creation form
                 Div(
                     H2("Create New Market"),
                     Form(
@@ -197,13 +196,22 @@ def register_market_routes(app, rt):
                 # Markets list
                 Div(
                     H2("Active Markets"),
-                    *[Div(market_card(m.id, m.question, m.status, show_plot=True), id=f"market-{m.id}") for m in markets] if markets else [Div("No markets yet. Create one above!", cls="empty-state")],
-                    id="markets-list",
+                    # Search bar
+                    Input(
+                        type="text",
+                        id="market-search",
+                        placeholder="Search markets...",
+                        style="width: 100%; margin-bottom: 20px; padding: 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-2); color: var(--text); font-family: 'JetBrains Mono', monospace;"
+                    ),
+                    # Markets grid
+                    Div(
+                        *[Div(market_card(m.id, m.question, m.status, show_plot=True), id=f"market-{m.id}", cls="market-item") for m in markets] if markets else [Div("No markets yet. Create one above!", cls="empty-state")],
+                        id="markets-list",
+                        cls="markets-grid"
+                    ),
                     cls="markets-section"
                 ),
                 
-                cls="container"
-            ),
             
             # JavaScript for outcome selection (global event delegation)
             Script("""
@@ -237,6 +245,51 @@ def register_market_routes(app, rt):
                         {generate_homepage_charts(markets)}
                     }}, 100);
                 }});
+            """),
+            
+            # Search functionality
+            Script("""
+                // Market search functionality
+                document.addEventListener('DOMContentLoaded', function() {
+                    const searchInput = document.getElementById('market-search');
+                    const marketItems = document.querySelectorAll('.market-item');
+                    
+                    if (searchInput) {
+                        searchInput.addEventListener('input', function() {
+                            const searchTerm = this.value.toLowerCase().trim();
+                            let visibleCount = 0;
+                            
+                            marketItems.forEach(function(item) {
+                                const marketCard = item.querySelector('.market-card');
+                                if (marketCard) {
+                                    const questionText = marketCard.querySelector('h3').textContent.toLowerCase();
+                                    const shouldShow = questionText.includes(searchTerm);
+                                    
+                                    if (shouldShow) {
+                                        item.style.display = 'block';
+                                        visibleCount++;
+                                    } else {
+                                        item.style.display = 'none';
+                                    }
+                                }
+                            });
+                            
+                            // Show/hide empty state
+                            const emptyState = document.querySelector('.empty-state');
+                            if (emptyState) {
+                                if (visibleCount === 0 && searchTerm !== '') {
+                                    emptyState.textContent = 'No markets found matching your search.';
+                                    emptyState.style.display = 'block';
+                                } else if (visibleCount === 0 && searchTerm === '') {
+                                    emptyState.textContent = 'No markets yet. Create one above!';
+                                    emptyState.style.display = 'block';
+                                } else {
+                                    emptyState.style.display = 'none';
+                                }
+                            }
+                        });
+                    }
+                });
             """)
         )
 
@@ -331,7 +384,18 @@ def register_market_routes(app, rt):
                                             font: {{
                                                 family: 'JetBrains Mono'
                                             }},
-                                            maxTicksLimit: 10
+                                            autoSkip: true,
+                                            maxTicksLimit: 5,
+                                            maxRotation: 0,
+                                            minRotation: 0,
+                                            callback: function(value, index, values) {{
+                                                // Only show every nth label to limit to ~5 labels
+                                                const step = Math.max(1, Math.floor(values.length / 5));
+                                                if (index % step === 0 || index === values.length - 1) {{
+                                                    return value;
+                                                }}
+                                                return '';
+                                            }}
                                         }},
                                         grid: {{
                                             color: '#444'
@@ -369,7 +433,8 @@ def register_market_routes(app, rt):
                     }}
                 }}, 100);
             """),
-            id=f"market-{market.id}"
+            id=f"market-{market.id}",
+            cls="market-item"
         )
 
     @rt("/trade/{market_id}")
@@ -419,7 +484,7 @@ def register_market_routes(app, rt):
             # Prepare chart data
             if history:
                 chart_data = {
-                    "labels": [h.timestamp.strftime("%m/%d %H:%M") for h in history],
+                    "labels": [h.timestamp.strftime("%m/%d") for h in history],
                     "datasets": [{
                         "label": "Yes Probability",
                         "data": [h.yes_price for h in history],
@@ -502,7 +567,18 @@ def register_market_routes(app, rt):
                                             font: {{
                                                 family: 'JetBrains Mono'
                                             }},
-                                            maxTicksLimit: 10
+                                            autoSkip: true,
+                                            maxTicksLimit: 5,
+                                            maxRotation: 0,
+                                            minRotation: 0,
+                                            callback: function(value, index, values) {{
+                                                // Only show every nth label to limit to ~5 labels
+                                                const step = Math.max(1, Math.floor(values.length / 5));
+                                                if (index % step === 0 || index === values.length - 1) {{
+                                                    return value;
+                                                }}
+                                                return '';
+                                            }}
                                         }},
                                         grid: {{
                                             color: '#444'
@@ -540,7 +616,8 @@ def register_market_routes(app, rt):
                     }}
                 }}, 100);
             """),
-            id=f"market-{market.id}"
+            id=f"market-{market.id}",
+            cls="market-item"
         )
     
     @rt("/market/{market_id}")
@@ -589,7 +666,7 @@ def register_market_routes(app, rt):
             # Prepare chart data
             if history:
                 chart_data = {
-                    "labels": [h.timestamp.strftime("%m/%d %H:%M") for h in history],
+                    "labels": [h.timestamp.strftime("%m/%d") for h in history],
                     "datasets": [{
                         "label": "Yes Probability",
                         "data": [h.yes_price for h in history],
@@ -623,14 +700,7 @@ def register_market_routes(app, rt):
                     }]
                 }
             
-            # Debug data - print chart values
-            print(f"DEBUG: Chart data for market {market_id}:")
-            print(f"  Number of history entries: {len(history)}")
-            print(f"  Labels: {chart_data['labels']}")
-            print(f"  Yes prices: {chart_data['datasets'][0]['data']}")
-            print(f"  No prices: {chart_data['datasets'][1]['data']}")
-            
-            return Titled(f"Market: {market.question}",
+            return Div(
                 Div(
                     # Back link at the very top
                     A("← Back to Markets", href="/", cls="back-link"),
@@ -697,6 +767,7 @@ def register_market_routes(app, rt):
                                                     font: {{
                                                         family: 'JetBrains Mono'
                                                     }},
+                                                    autoSkip: true,
                                                     maxTicksLimit: 10
                                                 }},
                                                 grid: {{
