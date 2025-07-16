@@ -37,19 +37,20 @@ DEFAULT_USER_ID = "user123"  # TODO: Replace with actual authentication
 MAX_MARKETS_PER_PAGE = 50
 MARKET_CARD_REFRESH_INTERVAL = 5000  # milliseconds
 
-# Color Scheme (CSS Variables)
+# Color Scheme (Flat UI Colors)
 COLORS = {
-    "PRIMARY": "#6366f1",
-    "PRIMARY_LIGHT": "#8b5cf6", 
-    "SECONDARY": "#10b981",
-    "DANGER": "#ef4444",
-    "SURFACE": "#ffffff",
-    "SURFACE_2": "#f8fafc",
-    "SURFACE_3": "#f1f5f9",
-    "TEXT": "#1e293b",
-    "TEXT_LIGHT": "#64748b",
-    "BORDER": "#e2e8f0",
-    "BORDER_LIGHT": "#f1f5f9"
+    "PRIMARY": "#3742fa",        # Blue
+    "SECONDARY": "#2ed573",      # Green (Yes)
+    "DANGER": "#ff3838",         # Red (No)
+    "BACKGROUND": "#f1f2f6",     # Light gray
+    "SURFACE": "#ffffff",        # White
+    "TEXT": "#2f3542",          # Dark gray
+    "TEXT_LIGHT": "#747d8c",    # Medium gray
+    "BORDER": "#dfe4ea",        # Light border
+    "ACCENT": "#ffa502",        # Orange accent
+    "PURPLE": "#5352ed",        # Purple
+    "TURQUOISE": "#7bed9f",     # Light green
+    "YELLOW": "#ffc048"         # Yellow
 }
 
 # Database Defaults

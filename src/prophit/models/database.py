@@ -43,6 +43,19 @@ class Position(Base):
     market = relationship("Market", back_populates="positions")
 
 
+class PriceHistory(Base):
+    __tablename__ = 'price_history'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    market_id = Column(Integer, ForeignKey('markets.id'), nullable=False)
+    yes_price = Column(Float, nullable=False)
+    no_price = Column(Float, nullable=False)
+    timestamp = Column(DateTime, default=func.now())
+    
+    # Relationship to market
+    market = relationship("Market")
+
+
 # Database setup
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

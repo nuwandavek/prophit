@@ -13,22 +13,26 @@ def create_app():
     app, rt = fast_app(
         pico=True,
         hdrs=(
+            Link(rel="stylesheet", href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"),
             Script(src="https://unpkg.com/htmx.org@1.9.6"),
+            Script(src="https://cdn.jsdelivr.net/npm/chart.js"),
             Style("""
                 :root {
-                    --primary: #6366f1;
-                    --primary-light: #8b5cf6;
-                    --secondary: #10b981;
-                    --danger: #ef4444;
-                    --surface: #ffffff;
-                    --surface-2: #f8fafc;
-                    --surface-3: #f1f5f9;
-                    --text: #1e293b;
-                    --text-light: #64748b;
-                    --border: #e2e8f0;
-                    --border-light: #f1f5f9;
-                    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-                    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+                    --primary: #c0392b;
+                    --primary-hover: #e74c3c;
+                    --secondary: #56d364;
+                    --danger: #f85149;
+                    --background: #1a1a1a;
+                    --surface: #2a2a2a;
+                    --surface-2: #333;
+                    --text: #e0e0e0;
+                    --text-light: #888;
+                    --border: #444;
+                    --border-light: #555;
+                    --accent: #c0392b;
+                    --success: #56d364;
+                    --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+                    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.4);
                 }
                 
                 * {
@@ -36,45 +40,47 @@ def create_app():
                 }
                 
                 body {
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    font-family: 'JetBrains Mono', monospace;
+                    background: var(--background);
                     min-height: 100vh;
                     margin: 0;
                     padding: 2rem 1rem;
                     color: var(--text);
+                    line-height: 1.5;
                 }
                 
                 .container {
-                    max-width: 800px;
+                    max-width: 1000px;
                     margin: 0 auto;
                     background: var(--surface);
-                    border-radius: 16px;
-                    box-shadow: var(--shadow-lg);
+                    border-radius: 6px;
+                    box-shadow: var(--shadow);
                     padding: 2rem;
                 }
                 
                 h1 {
                     text-align: center;
-                    color: var(--primary);
+                    color: var(--text);
                     margin-bottom: 2rem;
                     font-size: 2.5rem;
-                    font-weight: 700;
-                    background: linear-gradient(135deg, var(--primary), var(--primary-light));
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    background-clip: text;
+                    font-weight: 600;
+                }
+                
+                h2 {
+                    color: var(--text);
+                    font-size: 1.5rem;
+                    font-weight: 500;
+                    margin-bottom: 1.5rem;
                 }
                 
                 .market-card {
                     background: var(--surface);
                     border: 1px solid var(--border);
-                    border-radius: 12px;
-                    padding: 1.5rem;
-                    margin: 1.5rem 0;
+                    border-radius: 6px;
+                    padding: 20px;
+                    margin: 20px 0;
                     box-shadow: var(--shadow);
                     transition: all 0.2s ease;
-                    position: relative;
-                    overflow: hidden;
                 }
                 
                 .market-card:hover {
@@ -83,119 +89,126 @@ def create_app():
                     border-color: var(--primary);
                 }
                 
-                .market-card::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    height: 3px;
-                    background: linear-gradient(90deg, var(--primary), var(--primary-light));
-                }
-                
                 .market-card h3 {
                     color: var(--text);
-                    margin-bottom: 1rem;
-                    font-size: 1.25rem;
-                    font-weight: 600;
+                    margin-bottom: 15px;
+                    font-size: 1.2rem;
+                    font-weight: 500;
+                }
+                
+                .market-card h3 a {
+                    color: var(--primary);
+                    text-decoration: none;
+                }
+                
+                .market-card h3 a:hover {
+                    color: var(--primary-hover);
+                    text-decoration: underline;
                 }
                 
                 .prices-container {
                     display: flex;
-                    gap: 2rem;
-                    margin-bottom: 1rem;
+                    gap: 20px;
+                    margin-bottom: 15px;
                 }
                 
                 .price-display {
                     flex: 1;
                     background: var(--surface-2);
-                    padding: 1rem;
-                    border-radius: 8px;
+                    padding: 15px;
+                    border-radius: 6px;
                     text-align: center;
                     font-size: 1.1rem;
                     font-weight: 600;
-                    transition: all 0.2s ease;
+                    border: 1px solid var(--border);
                 }
                 
                 .price-display.yes {
                     color: var(--secondary);
-                    border-left: 4px solid var(--secondary);
+                    border-left: 3px solid var(--secondary);
                 }
                 
                 .price-display.no {
                     color: var(--danger);
-                    border-left: 4px solid var(--danger);
+                    border-left: 3px solid var(--danger);
                 }
                 
                 .shares-info {
                     display: flex;
-                    gap: 2rem;
-                    margin-bottom: 1rem;
-                    font-size: 0.875rem;
+                    gap: 20px;
+                    margin-bottom: 15px;
+                    font-size: 0.9rem;
                     color: var(--text-light);
                 }
                 
                 .trade-form {
                     display: flex;
-                    gap: 1rem;
+                    gap: 15px;
                     align-items: center;
                     flex-wrap: wrap;
-                    margin-top: 1.5rem;
-                    padding-top: 1.5rem;
-                    border-top: 1px solid var(--border-light);
+                    margin-top: 20px;
+                    padding-top: 20px;
+                    border-top: 1px solid var(--border);
                 }
                 
                 .outcome-btn {
-                    padding: 0.75rem 1.5rem;
-                    border: 2px solid var(--border);
-                    background: var(--surface);
+                    padding: 10px 20px;
+                    border: 1px solid var(--border);
+                    background: var(--surface-2);
                     color: var(--text);
-                    border-radius: 8px;
+                    border-radius: 6px;
                     cursor: pointer;
                     font-weight: 500;
+                    font-family: 'JetBrains Mono', monospace;
                     transition: all 0.2s ease;
-                    border: none;
-                    box-shadow: var(--shadow);
                 }
                 
                 .outcome-btn:hover {
+                    background: var(--border);
                     transform: translateY(-1px);
-                    box-shadow: var(--shadow-lg);
                 }
                 
                 .outcome-btn.selected {
                     background: var(--primary);
                     color: white;
-                    transform: translateY(-1px);
-                    box-shadow: var(--shadow-lg);
+                    border-color: var(--primary);
                 }
                 
                 .outcome-btn.yes.selected {
                     background: var(--secondary);
+                    border-color: var(--secondary);
                 }
                 
                 .outcome-btn.no.selected {
                     background: var(--danger);
+                    border-color: var(--danger);
                 }
                 
                 input[type="number"] {
-                    padding: 0.75rem;
-                    border: 2px solid var(--border);
-                    border-radius: 8px;
+                    padding: 10px;
+                    border: 1px solid var(--border);
+                    border-radius: 6px;
+                    background: var(--surface-2);
+                    color: var(--text);
+                    font-family: 'JetBrains Mono', monospace;
                     font-size: 1rem;
-                    width: 120px;
+                    width: 100px;
                     transition: border-color 0.2s ease;
                 }
                 
                 input[type="number"]:focus {
                     outline: none;
                     border-color: var(--primary);
+                    background: var(--surface);
                 }
                 
                 input[type="text"] {
-                    padding: 0.75rem;
-                    border: 2px solid var(--border);
-                    border-radius: 8px;
+                    padding: 10px;
+                    border: 1px solid var(--border);
+                    border-radius: 6px;
+                    background: var(--surface-2);
+                    color: var(--text);
+                    font-family: 'JetBrains Mono', monospace;
                     font-size: 1rem;
                     transition: border-color 0.2s ease;
                 }
@@ -203,53 +216,77 @@ def create_app():
                 input[type="text"]:focus {
                     outline: none;
                     border-color: var(--primary);
+                    background: var(--surface);
                 }
                 
                 button[type="submit"] {
                     background: var(--primary);
                     color: white;
                     border: none;
-                    padding: 0.75rem 1.5rem;
-                    border-radius: 8px;
+                    padding: 10px 20px;
+                    border-radius: 6px;
                     font-weight: 500;
+                    font-family: 'JetBrains Mono', monospace;
                     cursor: pointer;
                     transition: all 0.2s ease;
-                    box-shadow: var(--shadow);
                 }
                 
                 button[type="submit"]:hover {
-                    background: var(--primary-light);
+                    background: var(--primary-hover);
                     transform: translateY(-1px);
-                    box-shadow: var(--shadow-lg);
                 }
                 
                 .create-market-form {
                     background: var(--surface-2);
-                    padding: 2rem;
-                    border-radius: 12px;
-                    margin-bottom: 2rem;
-                    border: 1px solid var(--border-light);
+                    padding: 20px;
+                    border-radius: 6px;
+                    margin-bottom: 20px;
+                    border: 1px solid var(--border);
                 }
                 
                 .create-market-form h2 {
                     color: var(--text);
-                    margin-bottom: 1.5rem;
-                    font-size: 1.5rem;
-                    font-weight: 600;
+                    margin-bottom: 15px;
+                    font-size: 1.3rem;
+                    font-weight: 500;
                 }
                 
                 .markets-section h2 {
                     color: var(--text);
-                    margin-bottom: 1.5rem;
-                    font-size: 1.5rem;
-                    font-weight: 600;
+                    margin-bottom: 20px;
+                    font-size: 1.3rem;
+                    font-weight: 500;
                 }
                 
                 .empty-state {
                     text-align: center;
-                    padding: 3rem;
+                    padding: 40px;
                     color: var(--text-light);
-                    font-size: 1.1rem;
+                    font-size: 1rem;
+                    background: var(--surface-2);
+                    border-radius: 6px;
+                    border: 1px solid var(--border);
+                }
+                
+                .chart-container {
+                    background: var(--surface-2);
+                    padding: 20px;
+                    border-radius: 6px;
+                    border: 1px solid var(--border);
+                    box-shadow: var(--shadow);
+                }
+                
+                .back-link {
+                    display: inline-block;
+                    margin-bottom: 20px;
+                    color: var(--primary);
+                    text-decoration: none;
+                    font-weight: 500;
+                }
+                
+                .back-link:hover {
+                    color: var(--primary-hover);
+                    text-decoration: underline;
                 }
                 
                 @media (max-width: 640px) {
